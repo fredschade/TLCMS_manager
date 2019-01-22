@@ -25,4 +25,5 @@ observeEvent(input$Serial_port_disconnect,{
         }
     })
 
-
+#autoconnect
+Connect_with_the_board()

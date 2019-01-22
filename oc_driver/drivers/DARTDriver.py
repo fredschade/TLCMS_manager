@@ -53,11 +53,11 @@ class DARTDriver():
         self.track_config = tracks
 
     def generate_gcode(self):
-        gcode_start = GCODES.fan_power(True) + GCODES.START + GCODES.go_speed(
-            self.DART_config.get_moving_speed())
+        gcode_start = GCODES.new_lines([GCODES.fan_power(True),
+					GCODES.START])
         gcode_for_tracks = GCODES.new_lines(self.tracks_to_gcode())
         gcode_end = GCODES.END
-        return (gcode_start + "\n" + gcode_for_tracks + "\n" + gcode_end)
+        return (gcode_start + "\n" +  gcode_for_tracks + "\n" + gcode_end)
 
     def get_default_DART_config(self):
         return self.DART_CONFIG_DEFAULT
@@ -75,7 +75,8 @@ class DARTDriver():
         moving_speed = self.DART_config.get_moving_speed()
         MS_status = self.DART_config.get_MS_status()
         for track_y in self.track_config:
-            gcode_for_tracks.append(self.generate_gcode_for_MS(MS_status))
+            if (MS_status):
+                gcode_for_tracks.append(self.generate_gcode_for_MS(MS_status))
             gcode_for_tracks.append(GCODES.DART_track_scan(track_y, track_start_x, track_end_x, \
                                                             scan_speed, moving_speed))
             gcode_for_tracks.append(
@@ -84,16 +85,14 @@ class DARTDriver():
         return gcode_for_tracks
 
     def generate_gcode_for_MS(self, MS_status):
-        if (MS_status):
             return GCODES.mass_spectrometer_power(True) + GCODES.wait(20) + \
         GCODES.mass_spectrometer_power(False)
-        else:
-            return ""
+
 
     def generate_gcode_and_send(self):
         gcode = self.generate_gcode()
-        print(gcode)
         gcode_list = gcode.split('\n')
+        print gcode_list
         self.communication.send(gcode_list)
 
     def start_application(self):
