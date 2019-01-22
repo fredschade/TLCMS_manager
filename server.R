@@ -22,7 +22,7 @@ shinyServer(function(input, output,session) {
    
   session$onSessionEnded(function() {
       ocDriver$disconnect()
-      stopApp()
+ #     stopApp()
   })
 
 })
