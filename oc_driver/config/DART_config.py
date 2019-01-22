@@ -7,7 +7,7 @@ class DART:
         } """
         self.scan_speed = float(DART_config.get('scan_speed'))
         self.moving_speed = float(DART_config.get('moving_speed'))
-        self.MS_status = bool(int(DART_config.get('MS_status')))
+        self.MS_status = bool(float(DART_config.get('MS_status')))
 
     def get_scan_speed(self):
         "speed while scan-process: mm/minute"

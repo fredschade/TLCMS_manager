@@ -72,7 +72,7 @@ createApplicationPlot <- function ( plate_config, numberOfTracks){
     plot(c(1,100),c(1,100),
          type="n",xaxt = 'n',
          xlim=c(0,100),ylim=c(0,100),
-         xlab="Track direction (Y)",ylab="Scan direction (X) ")
+         xlab="Track direction (X)",ylab="Scan direction (Y) ")
 
     axis(1)
     start_track=relative_band_distance_x
@@ -90,12 +90,12 @@ createApplicationPlot <- function ( plate_config, numberOfTracks){
 
 toTableDARTRFormat  <- function(pythonDARTConf){
     labels = c("Turn MS on","Scan Speed", "Moving Speed")
-    units = c("", "mm/min", "mm/min")
+    units = c("", "mm/s", "mm/s")
     return (toRSettingsTableFormat(pythonDARTConf, labels, units))
 }
 
 toTablePlateRFormat  <- function(pythonPlateConf) {
-    labels = c("Track Distance [Y]", "Track Distance [X]", "Plate Height [Y]", "Plate Width [X]","Length of the Track", "Gap between tracks")
+    labels = c("Start Track [X]", "Start Track [Y]", "Plate Height [Y]", "Plate Width [X]","Length of the Track", "Track Distance")
     units = c("mm", "mm", "mm", "mm", "mm", "mm")
     return (toRSettingsTableFormat(pythonPlateConf, labels, units))
 }
@@ -111,7 +111,7 @@ output$DART_plot = renderPlot({
     currentMethod= Method$control[[index]]
     if(!is.null(currentMethod)){
         plate_config = currentMethod$plate_config
-        numberOfTracks= as.numeric(getNumberOfTracks())
+        numberOfTracks= as.integer(getNumberOfTracks())
         createApplicationPlot(plate_config, numberOfTracks)
     }
     else{
@@ -123,7 +123,7 @@ output$Method_step_feedback = renderText({
   validate(
     need(length(Method$control) > 0 ,"add a step or load a saved method")
   )
-  Method$control[[as.numeric(input$Method_steps)]]$info
+  Method$control[[as.integer(input$Method_steps)]]$info
 })
 
 output$DART_config = renderRHandsontable({  validate(

@@ -15,8 +15,8 @@ class DARTDriver():
     }
 
     DART_CONFIG_DEFAULT = {
-        'scan_speed': 3000,
-        'moving_speed': 3000,
+        'scan_speed': 0.2,
+        'moving_speed': 2,
         'MS_status': 0,
     }
 
@@ -53,11 +53,10 @@ class DARTDriver():
         self.track_config = tracks
 
     def generate_gcode(self):
-        gcode_start = GCODES.new_lines([GCODES.fan_power(True),
-					GCODES.START])
+        gcode_start = GCODES.new_lines([GCODES.fan_power(True), GCODES.START])
         gcode_for_tracks = GCODES.new_lines(self.tracks_to_gcode())
         gcode_end = GCODES.END
-        return (gcode_start + "\n" +  gcode_for_tracks + "\n" + gcode_end)
+        return (gcode_start + "\n" + gcode_for_tracks + "\n" + gcode_end)
 
     def get_default_DART_config(self):
         return self.DART_CONFIG_DEFAULT
@@ -71,8 +70,10 @@ class DARTDriver():
         plate_x = self.plate.get_plate_width_x()
         track_end_x = track_start_x + track_length
         gcode_for_tracks = []
-        scan_speed = self.DART_config.get_scan_speed()
-        moving_speed = self.DART_config.get_moving_speed()
+        scan_speed = self.calculate_speed_in_mm_per_min(
+            self.DART_config.get_scan_speed())
+        moving_speed = self.calculate_speed_in_mm_per_min(
+            self.DART_config.get_moving_speed())
         MS_status = self.DART_config.get_MS_status()
         for track_y in self.track_config:
             if (MS_status):
@@ -85,9 +86,8 @@ class DARTDriver():
         return gcode_for_tracks
 
     def generate_gcode_for_MS(self, MS_status):
-            return GCODES.mass_spectrometer_power(True) + GCODES.wait(20) + \
-        GCODES.mass_spectrometer_power(False)
-
+        return GCODES.mass_spectrometer_power(True) + GCODES.wait(20) + \
+    GCODES.mass_spectrometer_power(False)
 
     def generate_gcode_and_send(self):
         gcode = self.generate_gcode()
@@ -97,3 +97,6 @@ class DARTDriver():
 
     def start_application(self):
         self.generate_gcode_and_send()
+
+    def calculate_speed_in_mm_per_min(self, speed):
+        return speed * 60
